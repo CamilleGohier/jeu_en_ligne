@@ -17,7 +17,6 @@ export const seedOptions = [
         seed: 'wheat_seed', 
         quantity: 5
     },
-
     {
         key: 'tomato',
         name: 'Tomate', 
@@ -26,3 +25,5 @@ export const seedOptions = [
         quantity: 5
     }
 ];
+
+export let canWalk = true;

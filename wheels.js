@@ -16,10 +16,13 @@ export function createToolWheel(scene) {
             const toolIcon = scene.add.sprite(x, y, toolOptions[i].key).setInteractive().setScale(1.5);
             scene.toolWheel.push(toolIcon);
 
+            scene.selectedTool = toolOptions[0];
+            scene.toolWheel[0].setTint(0xff5555);
+
             toolIcon.on('pointerdown', () => {
                 scene.toolWheel.forEach(icon => icon.clearTint());
                 toolIcon.setTint(0xff5555);
-                scene.selectedTool = toolOptions[i].name;
+                scene.selectedTool = toolOptions[i];
             });
         }
     }
@@ -49,6 +52,9 @@ export function createSecondaryWheel(scene) {
 
             const seedIcon = scene.add.sprite(x, y, seedOptions[i].key).setInteractive().setScale(1.5);
             scene.seedWheel.push(seedIcon);
+
+            scene.selectedSeed = seedOptions[0];
+            scene.seedWheel[0].setTint(0xff5555);
 
             seedIcon.on('pointerdown', () => {
                 scene.seedWheel.forEach(icon => icon.clearTint());

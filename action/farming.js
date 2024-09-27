@@ -1,7 +1,9 @@
-export function doAction(scene) {
+import { drop_item } from '../tool_file/drop_item.js';
+
+export function startFarming(scene) {
     const x = Math.floor(scene.character.x / 32);
     const y = Math.floor(scene.character.y / 32);
-    const cell = scene.grid.find(c => c.x == x && c.y == y);
+    const cell = scene.soilGrid.find(c => c.x == x && c.y == y);
     
     if (scene.selectedSeed && cell && scene.inventory[scene.selectedSeed.seed] > 0 && !cell.planted) {
         plantSeed(scene, cell, scene.selectedSeed);
@@ -14,6 +16,7 @@ export function doAction(scene) {
 export function plantSeed(scene, cell, seedType) {
     if (!cell.planted) {
         if (scene.inventory[seedType.seed] > 0) {
+            scene.character.isFarming = true;
             cell.planted = true;
             cell.crop = scene.add.image(cell.x * 32, cell.y * 32, seedType.crop, 0).setOrigin(0);
             cell.growthStage = 0;
@@ -45,30 +48,15 @@ export function startGrowing(scene, cell) {
 
 export function harvestCrop(scene, cell) {
     if (cell.planted && cell.growthStage == 3) {
+        scene.character.isFarming = true;
         let cropType = cell.cropType;
-        let cropItem = scene.physics.add.sprite(cell.x * 32, cell.y * 32, cropType.key).setOrigin(0);
-        let seedItem = scene.physics.add.sprite(cell.x * 32, cell.y * 32, cropType.seed).setOrigin(0);
+        
+        drop_item(scene, cell.x * 32, cell.y * 32, scene.character.x, scene.character.y, cropType.key, (item) => {
+            collectItem(scene, cropType.key, cropType.key, cropType.name);
+        });
 
-        scene.tweens.add({
-            targets: cropItem,
-            x: scene.character.x + Phaser.Math.Between(-20, 20),
-            y: scene.character.y + Phaser.Math.Between(-20, 20),
-            duration: 500,
-            ease: 'Power2',
-            onComplete: () => {
-                collectItem(scene, cropType.key, cropType.key, cropType.name, cropItem);
-            }
-        })
-
-        scene.tweens.add({
-            targets: seedItem,
-            x: scene.character.x + Phaser.Math.Between(-20, 20),
-            y: scene.character.y + Phaser.Math.Between(-20, 20),
-            duration: 500,
-            ease: 'Power2',
-            onComplete: () => {
-                collectItem(scene, cropType.seed, cropType.key + 'Seed', "Graine de " + cropType.name, seedItem);
-            }
+        drop_item(scene, cell.x * 32, cell.y * 32, scene.character.x, scene.character.y, cropType.seed, (item) => {
+            collectItem(scene, cropType.seed, cropType.key + 'Seed', "Graine de " + cropType.name);
         })
 
         cell.planted = false;
@@ -78,18 +66,7 @@ export function harvestCrop(scene, cell) {
     }
 }
 
-function collectItem(scene, type, text, textName, item) {
+function collectItem(scene, type, text, textName) {
         scene.inventory[type] += 1;
         scene[text + 'Text'].setText(textName + ' : ' + scene.inventory[type]);
-
-    scene.tweens.add({
-        targets: item,
-        x: scene.character.x,
-        y: scene.character.y,
-        duration: 300,
-        ease: 'Power2',
-        onComplete: () => {
-            item.destroy();
-        }
-    })
 }

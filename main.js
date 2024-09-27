@@ -1,14 +1,16 @@
 import { preload } from './assets.js';
 import { characterAnimations, updateCharacterAnimation } from './character.js';
-import { createGrid } from './grid.js';
+import { createSoilGrid, createWaterGrid } from './grid.js';
 import { createInventory } from './inventory.js';
 import { createToolWheel, hideToolWheel, createSecondaryWheel, hideSecondaryWheel } from './wheels.js';
-import { doAction } from './farming.js';
+import { startFarming } from './action/farming.js';
+import { startFishing } from "./action/fishing.js";
 
 const config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
+    pixelArt: true,
     physics: {
         default: 'arcade',
         arcade: {
@@ -28,15 +30,18 @@ const game = new Phaser.Game(config);
 function create() {
 
     //Grille
-    createGrid(this);
+    createSoilGrid(this);
+    createWaterGrid(this);
 
     // Personnage
+    this.canWalk = true;
     characterAnimations(this);
 
     // Affichage de l'inventaire
     createInventory(this);
 
-    //Création des roues
+    // Création des roues
+    this.selectedTool = null;
     this.selectedSeed = null;
     this.toolWheel = null;
     this.seedWheel = null;
@@ -54,12 +59,16 @@ function create() {
     this.input.keyboard.on('keydown-E', () => createSecondaryWheel(this));
     this.input.keyboard.on('keyup-E', () => hideSecondaryWheel(this));
 
-    this.input.keyboard.on('keydown-SPACE', () => doAction(this));
+    this.input.keyboard.on('keydown-SPACE', () => {
+        if (this.selectedTool.key == 'fishing_rod') {
+            startFishing(this);
+        }
+        else if (this.selectedTool.key == 'hoe'){
+            startFarming(this);
+        }
+    });
 }
 
 function update() {
     updateCharacterAnimation(this);
-
-    // console.log(this.inventory);
-    // console.log(this.selectedSeed);
 }
