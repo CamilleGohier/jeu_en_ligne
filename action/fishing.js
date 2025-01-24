@@ -1,7 +1,7 @@
 import { drop_item } from "../tool_file/drop_item.js";
+import { walking_queue } from "../tool_file/walking_queue.js";
 
 let fishingInProgress = false;
-let fishCaught = null;
 let fishingTimeout;
 
 export function startFishing(scene) {
@@ -11,13 +11,13 @@ export function startFishing(scene) {
 
     if (cell && !fishingInProgress) {
         fishingInProgress = true;
-        scene.canWalk = false;
+        walking_queue(scene, 'fishing', 'cannot');
         scene.character.isFishing = true;
 
         fishingTimeout = scene.time.delayedCall(3000, () => {
             let information = scene.add.image(scene.character.x - 16, scene.character.y - 52, 'information').setOrigin(0);
-
-            scene.input.keyboard.once('keydown-SPACE', () => {
+                
+            scene.input.once('pointerdown', (pointer) => {
                 recoverFish(scene);
                 information.destroy();
             });
@@ -26,27 +26,13 @@ export function startFishing(scene) {
 
     function recoverFish(scene) {
         clearTimeout(fishingTimeout);
-
-        fishCaught = getRandomFish();
-        drop_item(scene, scene.character.x - 16, scene.character.y - 16, scene.character.x, scene.character.y, fishCaught.key);
-        
-        scene.inventory[fishCaught.key] += 1;
-        scene[fishCaught.key + "Text"].setText(fishCaught.name + ' : ' + scene.inventory[fishCaught.key]);
+        drop_item(scene, scene.character.x - 16, scene.character.y - 16, scene.character.x, scene.character.y, "fishing");
     
         fishingInProgress = false;
-        scene.canWalk = true;
+        walking_queue(scene, 'fishing', 'can');
         scene.character.isFishing = false;
 
         scene.fishingRod.destroy();
         scene.fishingRod = null;
-    }
-
-    function getRandomFish() {
-        const fishOptions = [
-            {key: 'fish', name:'Poisson'},
-            {key: 'waste', name:'Déchet'}
-        ];
-    
-        return Phaser.Utils.Array.GetRandom(fishOptions);
     }
 }

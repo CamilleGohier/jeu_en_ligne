@@ -4,30 +4,38 @@ export function startFarming(scene) {
     const x = Math.floor(scene.character.x / 32);
     const y = Math.floor(scene.character.y / 32);
     const cell = scene.soilGrid.find(c => c.x == x && c.y == y);
-    
-    if (scene.selectedSeed && cell && scene.inventory[scene.selectedSeed.seed] > 0 && !cell.planted) {
-        plantSeed(scene, cell, scene.selectedSeed);
+
+    let seed = null;
+
+    // Trouve la graine sélectionnée dans l'inventaire
+    for (let row = 0; row < scene.inventory.length; row++) {
+        for (let col = 0; col < scene.inventory[row].length; col++) {
+            if (scene.inventory[row][col] && scene.inventory[row][col].name == scene.selectedSeed) {
+                seed = scene.inventory[row][col];
+            }
+        }
+    }
+
+    // Si une graine est sélectionnée, qu'elle est dans l'inventaire et qu'elle n'est pas déjà plantée, on continue
+    if (seed && cell && !cell.planted && seed.quantity.text > 0) {
+        plantSeed(scene, cell, seed);
     }
     else if (cell && cell.planted && cell.growthStage == 3) {
         harvestCrop(scene, cell);
     }
 }
 
-export function plantSeed(scene, cell, seedType) {
-    if (!cell.planted) {
-        if (scene.inventory[seedType.seed] > 0) {
-            scene.character.isFarming = true;
-            cell.planted = true;
-            cell.crop = scene.add.image(cell.x * 32, cell.y * 32, seedType.crop, 0).setOrigin(0);
-            cell.growthStage = 0;
-            cell.cropType = seedType;
+export function plantSeed(scene, cell, seed) {
+    scene.character.isFarming = true;
+    cell.planted = true;
+    cell.crop = scene.add.image(cell.x * 32, cell.y * 32, seed.name + '_crop', 0).setOrigin(0);
+    cell.crop.name = seed.name + '_crop';
 
-            scene.inventory[seedType.seed] -= 1;
-            scene[seedType.key + "SeedText"].setText('Graine de ' + seedType.name + ' : ' + scene.inventory[seedType.seed]);
-            
-            startGrowing(scene, cell);
-        }
-    }
+    cell.growthStage = 0;
+
+    seed.quantity.text = parseInt(seed.quantity.text) - 1;
+    
+    startGrowing(scene, cell);
 }
 
 export function startGrowing(scene, cell) {
@@ -47,26 +55,13 @@ export function startGrowing(scene, cell) {
 }
 
 export function harvestCrop(scene, cell) {
-    if (cell.planted && cell.growthStage == 3) {
-        scene.character.isFarming = true;
-        let cropType = cell.cropType;
-        
-        drop_item(scene, cell.x * 32, cell.y * 32, scene.character.x, scene.character.y, cropType.key, (item) => {
-            collectItem(scene, cropType.key, cropType.key, cropType.name);
-        });
+    scene.character.isFarming = true;
+    let crop = cell.crop;
+    
+    drop_item(scene, cell.x * 32, cell.y * 32, scene.character.x, scene.character.y, crop.name);
 
-        drop_item(scene, cell.x * 32, cell.y * 32, scene.character.x, scene.character.y, cropType.seed, (item) => {
-            collectItem(scene, cropType.seed, cropType.key + 'Seed', "Graine de " + cropType.name);
-        })
-
-        cell.planted = false;
-        cell.crop.destroy();
-        cell.crop = null;
-        cell.growthStage = 0;
-    }
-}
-
-function collectItem(scene, type, text, textName) {
-        scene.inventory[type] += 1;
-        scene[text + 'Text'].setText(textName + ' : ' + scene.inventory[type]);
+    cell.planted = false;
+    cell.crop.destroy();
+    cell.crop = null;
+    cell.growthStage = 0;
 }

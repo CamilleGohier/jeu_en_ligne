@@ -1,10 +1,16 @@
 import { preload } from './assets.js';
 import { characterAnimations, updateCharacterAnimation } from './character.js';
+import { setCamera } from './camera.js';
 import { createSoilGrid, createWaterGrid } from './grid.js';
-import { createInventory } from './inventory.js';
-import { createToolWheel, hideToolWheel, createSecondaryWheel, hideSecondaryWheel } from './wheels.js';
+import { createWorld } from './world.js';
+import { createInventory, showInventory, hideInventory } from './inventory.js';
+import { createToolBar, selectPreviousTool, selectNextTool, createSecondaryToolBar, selectSecondPreviousTool, selectSecondNextTool, hideWheel } from './toolbar.js';
 import { startFarming } from './action/farming.js';
 import { startFishing } from "./action/fishing.js";
+import { startChopping } from './action/chopping.js';
+import { startMining } from './action/mining.js';
+
+import { toolOptions } from './data/variables.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -25,46 +31,90 @@ const config = {
     }
 };
 
+let isASelected = false;
+
 const game = new Phaser.Game(config);
 
-function create() {
+window.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+});
 
+function create() {
     //Grille
     createSoilGrid(this);
     createWaterGrid(this);
 
     // Personnage
-    this.canWalk = true;
+    this.canWalk = [];
     characterAnimations(this);
 
-    // Affichage de l'inventaire
+    // Environnement
+    createWorld(this);
+
+    // Caméra
+    setCamera(this);
+
+    // Création de l'inventaire
     createInventory(this);
 
-    // Création des roues
-    this.selectedTool = null;
-    this.selectedSeed = null;
-    this.toolWheel = null;
-    this.seedWheel = null;
-
-    createToolWheel(this);
-    hideToolWheel(this);
-
-    createSecondaryWheel(this);
-    hideSecondaryWheel(this);
+    // Affichage de la barre d'outils
+    createToolBar(this);
 
     // Actions de touches
-    this.input.keyboard.on('keydown-A', () => createToolWheel(this));
-    this.input.keyboard.on('keyup-A', () => hideToolWheel(this));
-
-    this.input.keyboard.on('keydown-E', () => createSecondaryWheel(this));
-    this.input.keyboard.on('keyup-E', () => hideSecondaryWheel(this));
-
-    this.input.keyboard.on('keydown-SPACE', () => {
-        if (this.selectedTool.key == 'fishing_rod') {
-            startFishing(this);
+    this.input.on('wheel', (pointer, gameObject, deltaX, deltaY, deltaZ) => {
+        if (isASelected && toolOptions[this.selectedTool].key == 'hoe') {
+            if(deltaY > 0) {
+                selectSecondNextTool(this);
+            }
+            else {
+                selectSecondPreviousTool(this);
+            }
         }
-        else if (this.selectedTool.key == 'hoe'){
-            startFarming(this);
+        else {
+            if(deltaY > 0) {
+                selectNextTool(this);
+            }
+            else {
+                selectPreviousTool(this);
+            }
+        }
+        
+    });
+
+    this.input.keyboard.on('keydown-A', () => {
+        if (!isASelected) {
+            createSecondaryToolBar(this);
+            isASelected = true;
+        }
+    });
+
+    this.input.keyboard.on('keyup-A', () => {
+        isASelected = false;
+        hideWheel(this);
+    })
+
+    this.input.keyboard.on('keydown-E', () => {
+        showInventory(this);
+    });
+
+    this.input.keyboard.on('keyup-E', () => {
+        hideInventory(this);
+    })
+    
+    this.input.on('pointerdown', (pointer) => {
+        if (pointer.leftButtonDown()) {
+            if (toolOptions[this.selectedTool].key == 'fishing_rod') {
+                startFishing(this);
+            }
+            else if (toolOptions[this.selectedTool].key == 'hoe'){
+                startFarming(this);
+            }
+            else if (toolOptions[this.selectedTool].key == 'axe') {
+                startChopping(this);
+            }
+            else if (toolOptions[this.selectedTool].key == 'pickaxe') {
+                startMining(this);
+            }
         }
     });
 }

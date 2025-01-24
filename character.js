@@ -1,11 +1,21 @@
+import { endChopping } from "./action/chopping.js";
+import { endMining } from "./action/mining.js";
+
 export function characterAnimations(scene) {
     scene.character = scene.physics.add.sprite(400, 300, 'character').setCollideWorldBounds(true);
-    scene.cursors = scene.input.keyboard.createCursorKeys();
+    scene.cursors = scene.input.keyboard.addKeys({
+        up: Phaser.Input.Keyboard.KeyCodes.Z,
+        down: Phaser.Input.Keyboard.KeyCodes.S,
+        left: Phaser.Input.Keyboard.KeyCodes.Q,
+        right: Phaser.Input.Keyboard.KeyCodes.D
+    });
 
     scene.character.lastMove = 'down';
     scene.character.lastMoveX = 'left';
     scene.character.isFishing = false;
     scene.character.isFarming = false;
+    scene.character.isChopping = false;
+    scene.character.isMining = false;
 
     scene.anims.create({
         key: 'left',
@@ -49,6 +59,20 @@ export function characterAnimations(scene) {
         frameRate: 10,
         repeat: 0
     });
+
+    scene.anims.create({
+        key: 'choppingAxeAnim',
+        frames: scene.anims.generateFrameNumbers('character_chopping', { start: 0, end: 2}),
+        frameRate: 10,
+        repeat: 4
+    });
+
+    scene.anims.create({
+        key: 'miningPickaxeAnim',
+        frames: scene.anims.generateFrameNumbers('character_mining', { start: 0, end: 3}),
+        frameRate: 10,
+        repeat: 4
+    });
 }
 
 export function updateCharacterAnimation(scene) {
@@ -56,7 +80,7 @@ export function updateCharacterAnimation(scene) {
     let velocityY = 0;
     let moving = false;
 
-    if (scene.canWalk) {
+    if (scene.canWalk.length == 0) {
         if (scene.cursors.left.isDown) {
             velocityX = -160;
             moving = true;
@@ -177,6 +201,86 @@ export function updateCharacterAnimation(scene) {
                 case 'right':
                     scene.hoe.setPosition(scene.character.x + 20, scene.character.y);
                     scene.hoe.setScale(1, 1);
+                    break;
+            }
+        }
+    }
+
+    if(scene.character.isChopping) {
+        if(!scene.axe) {
+            scene.axe = scene.add.sprite(scene.character.x, scene.character.y, 'character_chopping');
+            
+            switch (scene.character.lastMoveX) {
+                case 'left':
+                    scene.axe.setPosition(scene.character.x -20, scene.character.y);
+                    scene.axe.setScale(-1, 1);
+                    break;
+
+                case 'right':
+                    scene.axe.setPosition(scene.character.x + 20, scene.character.y);
+                    scene.axe.setScale(1, 1);
+                    break;
+            }
+            scene.axe.play('choppingAxeAnim');
+
+            scene.axe.on('animationcomplete', () => {
+                scene.axe.destroy();
+                scene.axe = null;
+                scene.character.isChopping = false;
+                endChopping(scene);
+
+            });
+        }
+        else {
+            switch (scene.character.lastMoveX) {
+                case 'left':
+                    scene.axe.setPosition(scene.character.x - 20, scene.character.y);
+                    scene.axe.setScale(-1, 1);
+                    break;
+
+                case 'right':
+                    scene.axe.setPosition(scene.character.x + 20, scene.character.y);
+                    scene.axe.setScale(1, 1);
+                    break;
+            }
+        }
+    }
+
+    if(scene.character.isMining) {
+        if(!scene.pickaxe) {
+            scene.pickaxe = scene.add.sprite(scene.character.x, scene.character.y, 'character_mining');
+            
+            switch (scene.character.lastMoveX) {
+                case 'left':
+                    scene.pickaxe.setPosition(scene.character.x -20, scene.character.y);
+                    scene.pickaxe.setScale(-1, 1);
+                    break;
+
+                case 'right':
+                    scene.pickaxe.setPosition(scene.character.x + 20, scene.character.y);
+                    scene.pickaxe.setScale(1, 1);
+                    break;
+            }
+            scene.pickaxe.play('miningPickaxeAnim');
+
+            scene.pickaxe.on('animationcomplete', () => {
+                scene.pickaxe.destroy();
+                scene.pickaxe = null;
+                scene.character.isMining = false;
+                endMining(scene);
+
+            });
+        }
+        else {
+            switch (scene.character.lastMoveX) {
+                case 'left':
+                    scene.pickaxe.setPosition(scene.character.x - 20, scene.character.y);
+                    scene.pickaxe.setScale(-1, 1);
+                    break;
+
+                case 'right':
+                    scene.pickaxe.setPosition(scene.character.x + 20, scene.character.y);
+                    scene.pickaxe.setScale(1, 1);
                     break;
             }
         }
