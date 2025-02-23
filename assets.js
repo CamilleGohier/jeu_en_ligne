@@ -5,6 +5,7 @@ export function preload() {
 
     toolOptions.forEach(tool => this.load.image(tool.key, 'image/' + tool.key + '.png'));
 
+    this.load.spritesheet('grass', 'image/grass.png', {frameWidth: 32, frameHeight: 32});
     this.load.spritesheet('soil', 'image/soil.png', {frameWidth: 32, frameHeight: 32});
     this.load.image('water', 'image/water.png');
 
@@ -13,6 +14,12 @@ export function preload() {
     this.load.spritesheet('character_farming', 'image/character_farming.png', {frameWidth: 32, frameHeight: 32});
     this.load.spritesheet('character_chopping', 'image/character_chopping.png', {frameWidth: 32, frameHeight: 32});
     this.load.spritesheet('character_mining', 'image/character_mining.png', {frameWidth: 32, frameHeight: 32});
+    this.load.spritesheet('character_attacking', 'image/character_attacking.png', {frameWidth: 32, frameHeight: 32});
+
+    this.load.spritesheet('npc_idle', 'image/npc_idle.png', {frameWidth: 32, frameHeight: 32});
+    this.load.spritesheet('npc_walk', 'image/npc_walk.png', {frameWidth: 32, frameHeight: 32});
+
+    this.load.spritesheet('enemy', 'image/enemy.png', {frameWidth: 32, frameHeight: 32});
     
     this.load.image('wheat', 'image/wheat.png');
     this.load.image('wheat_seed', 'image/wheat_seed.png');
@@ -24,9 +31,10 @@ export function preload() {
     this.load.image('stick', 'image/stick.png');
     this.load.image('stone', 'image/stone.png');
     this.load.image('ore', 'image/ore.png');
-
     this.load.image('fish', 'image/guppy.png');
     this.load.image('waste', 'image/plastic_bag.png');
+    this.load.image('slime_bubble', 'image/slime_bubble.png');
+
     this.load.image('information', 'image/info.png');
 
     this.load.image('tree', 'image/tree.png');
@@ -36,4 +44,6 @@ export function preload() {
     this.load.image('inventory_background', 'image/inventory.png');
     this.load.image('tile', 'image/tile.png');
     this.load.image('arrow', 'image/arrow.png');
+
+    this.load.image('shelf', 'image/shelf.png');
 }

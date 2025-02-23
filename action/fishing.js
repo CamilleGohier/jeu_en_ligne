@@ -1,5 +1,5 @@
 import { drop_item } from "../tool_file/drop_item.js";
-import { walking_queue } from "../tool_file/walking_queue.js";
+import { walkingQueue } from "../tool_file/walking_queue.js";
 
 let fishingInProgress = false;
 let fishingTimeout;
@@ -11,7 +11,7 @@ export function startFishing(scene) {
 
     if (cell && !fishingInProgress) {
         fishingInProgress = true;
-        walking_queue(scene, 'fishing', 'cannot');
+        walkingQueue(scene, 'fishing', 'cannot');
         scene.character.isFishing = true;
 
         fishingTimeout = scene.time.delayedCall(3000, () => {
@@ -29,7 +29,7 @@ export function startFishing(scene) {
         drop_item(scene, scene.character.x - 16, scene.character.y - 16, scene.character.x, scene.character.y, "fishing");
     
         fishingInProgress = false;
-        walking_queue(scene, 'fishing', 'can');
+        walkingQueue(scene, 'fishing', 'can');
         scene.character.isFishing = false;
 
         scene.fishingRod.destroy();

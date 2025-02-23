@@ -2,7 +2,7 @@ export const data = {
     "wheat_seed_crop" : [
         {
             "item": "wheat_seed",
-            "quantity_max": 2
+            "quantity_max": 1
         },
         {
             "item": "wheat",
@@ -22,7 +22,7 @@ export const data = {
     "tree" : [
         {
             "item": "wood",
-            "quantity_max": 1
+            "quantity_max": 3
         },
         {
             "item": "stick",
@@ -46,5 +46,11 @@ export const data = {
         {
             "item" : "waste"
         }
+    ],
+    "enemy" : [
+        {
+            "item": "slime_bubble",
+            "quantity_max": 2
+        },
     ]
 }

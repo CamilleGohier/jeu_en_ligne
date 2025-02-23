@@ -1,7 +1,5 @@
 import { drop_item } from '../tool_file/drop_item.js';
-import { walking_queue } from "../tool_file/walking_queue.js";
-
-let miningInProgress = false;
+import { walkingQueue } from "../tool_file/walking_queue.js";
 
 export function startMining(scene) {
     let rock = null;
@@ -12,10 +10,9 @@ export function startMining(scene) {
         }
     });
 
-    if (!miningInProgress && rock) {
+    if (!scene.character.isMining && rock) {
         scene.character.isMining = true;
-        walking_queue(scene, 'mining', 'cannot');
-        miningInProgress = true;
+        walkingQueue(scene, 'mining', 'cannot');
     }
 }
 
@@ -30,7 +27,7 @@ export function endMining(scene) {
 
     scene.currentHitBox = scene.currentHitBox.filter(e => e !== rock);
 
-    walking_queue(scene, 'mining', 'can');
+    walkingQueue(scene, 'mining', 'can');
 
     drop_item(scene, rock.x, rock.y, scene.character.x, scene.character.y, 'rock');
     rock.destroy();

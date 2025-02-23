@@ -1,13 +1,13 @@
 import { toolOptions, secondOptions } from './data/variables.js';
 
 export function createToolBar(scene) {
-    const startX = 255;
-    const startY = 560;
+    const startX = 490;
+    const startY = 680;
     const outerSpacing = 10;
     const tileSize = 32;
     const spacing = 8;
 
-    scene.add.image(224, 500, 'inventory_background').setOrigin(0, 0).setScrollFactor(0);
+    scene.add.image(460, 620, 'inventory_background').setOrigin(0, 0).setScrollFactor(0);
 
     scene.toolBar = [];
 
@@ -54,10 +54,9 @@ export function selectNextTool(scene) {
 
 export function createSecondaryToolBar(scene) {
     const startX = 18;
-    const startY = 513;
+    const startY = 633;
 
-    const centerX = 400;
-    const centerY = 490;
+    const centerY = 610;
 
     const tileSize = 8;
     const spacing = 16;
@@ -73,7 +72,7 @@ export function createSecondaryToolBar(scene) {
     scene.wheel.tiles = [];
 
     if (secondOptions[selectedToolKey]) {
-        const background_wheel = scene.add.sprite(scene.toolBar[scene.selectedTool].x - 65, centerY, 'inventory_background').setOrigin(0, 0).setScale(0.4).setScrollFactor(0);
+        const background_wheel = scene.add.sprite(scene.toolBar[scene.selectedTool].x - 66, centerY, 'inventory_background').setOrigin(0, 0).setScale(0.4).setScrollFactor(0);
         scene.wheel.push(background_wheel);
 
         const arrow = scene.add.sprite(background_wheel.x + startX + 2 * (tileSize + spacing) + 1, startY + 15, 'arrow').setScale(0.75).setScrollFactor(0);

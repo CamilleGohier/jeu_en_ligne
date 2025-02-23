@@ -1,4 +1,5 @@
 import { drop_item } from '../tool_file/drop_item.js';
+import Inventory from '../stockage/Inventory.js';
 
 export function startFarming(scene) {
     const x = Math.floor(scene.character.x / 32);
@@ -8,16 +9,16 @@ export function startFarming(scene) {
     let seed = null;
 
     // Trouve la graine sélectionnée dans l'inventaire
-    for (let row = 0; row < scene.inventory.length; row++) {
-        for (let col = 0; col < scene.inventory[row].length; col++) {
-            if (scene.inventory[row][col] && scene.inventory[row][col].name == scene.selectedSeed) {
-                seed = scene.inventory[row][col];
+    for (let row = 0; row < Inventory.savedContent.length; row++) {
+        for (let col = 0; col < Inventory.savedContent[row].length; col++) {
+            if (Inventory.savedContent[row][col] && Inventory.savedContent[row][col].name == scene.selectedSeed) {
+                seed = Inventory.savedContent[row][col];
             }
         }
     }
 
     // Si une graine est sélectionnée, qu'elle est dans l'inventaire et qu'elle n'est pas déjà plantée, on continue
-    if (seed && cell && !cell.planted && seed.quantity.text > 0) {
+    if (seed && cell && !cell.planted && seed.quantity > 0) {
         plantSeed(scene, cell, seed);
     }
     else if (cell && cell.planted && cell.growthStage == 3) {
@@ -32,15 +33,15 @@ export function plantSeed(scene, cell, seed) {
     cell.crop.name = seed.name + '_crop';
 
     cell.growthStage = 0;
-
-    seed.quantity.text = parseInt(seed.quantity.text) - 1;
+    scene.inventory.load();
+    scene.inventory.removeItem(seed.name, 1);
     
     startGrowing(scene, cell);
 }
 
 export function startGrowing(scene, cell) {
     scene.time.addEvent({
-        delay: 1000,
+        delay: Phaser.Math.Between(3000, 8000),
         callback: () => {
             if (cell.growthStage < 3) {
                 cell.growthStage += 1;

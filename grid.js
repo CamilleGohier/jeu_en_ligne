@@ -1,3 +1,12 @@
+export function createGroundGrid(scene) {
+    for (let x = 0; x < (scene.physics.world.bounds.width /32); x++) {
+        for (let y = 0; y < (scene.physics.world.bounds.height /32); y++) {
+            const randomFrame = Phaser.Math.Between(0, 11);
+            scene.add.sprite(x * 32, y * 32, 'grass', randomFrame).setOrigin(0);
+        }
+    }
+}
+
 export function createSoilGrid(scene) {
     scene.soilGrid = [];
     for (let x = 0; x < 10; x++) {

@@ -1,67 +1,68 @@
 import { data } from '../data/loot.js';
-import { add_inventory } from '../inventory.js';
+import Inventory from '../stockage/Inventory.js';
 
-export function drop_item(scene, startX, startY, endX, endY, loot, onCompleteCallback) {
+export function drop_item(scene, startX, startY, endX, endY, loot) {
 
     let loot_tab = data[loot];
 
     if (loot == "fishing") {
         const random = loot_tab[Math.floor(Math.random() * loot_tab.length)];
-        let item = scene.physics.add.sprite(startX, startY, random.item).setOrigin(0);
+        let item = scene.physics.add.sprite(startX, startY, random.item).setOrigin(0).setScale(0.5);
         item.name = random.item;
 
-        scene.tweens.add({
-            targets: item,
-            x: startX + Phaser.Math.Between(-30, 30),
-            y: startY + Phaser.Math.Between(-30, 30),
-            duration: 500,
-            ease: 'Power2',
-            onComplete: () => {
-                scene.tweens.add({
-                    targets: item,
-                    x: endX - 16,
-                    y: endY - 16,
-                    duration: 500,
-                    ease: 'Power2',
-                    onComplete: () => {
-                        if (onCompleteCallback) {
-                            onCompleteCallback(item);
-                        }
-                        add_inventory(scene, item.name, 1);
-                        item.destroy();
-                    }
-                });
-            }
+        let angle = Phaser.Math.Between(0, 360);
+        let speed = Phaser.Math.Between(50, 150);
+        scene.physics.velocityFromAngle(angle, speed, item.body.velocity);
+
+        scene.droppedItemTab.push(item);
+
+        scene.time.delayedCall(300, () => {
+            item.isFollowing = true;
+            item.body.setVelocity(0);
         })
     }
     else {
         loot_tab.forEach(drop => {
-            let item = scene.physics.add.sprite(startX, startY, drop.item).setOrigin(0);
+            let item = scene.physics.add.sprite(startX, startY, drop.item).setOrigin(0).setScale(0.5);
             item.name = drop.item;
 
-            scene.tweens.add({
-                targets: item,
-                x: startX + Phaser.Math.Between(-30, 30),
-                y: startY + Phaser.Math.Between(-30, 30),
-                duration: 500,
-                ease: 'Power2',
-                onComplete: () => {
-                    scene.tweens.add({
-                        targets: item,
-                        x: endX - 16,
-                        y: endY - 16,
-                        duration: 500,
-                        ease: 'Power2',
-                        onComplete: () => {
-                            if (onCompleteCallback) {
-                                onCompleteCallback(item);
-                            }
-                            add_inventory(scene, item.name, drop.quantity_max);
-                            item.destroy();
-                        }
-                    });
-                }
+            let angle = Phaser.Math.Between(0, 360);
+            let speed = Phaser.Math.Between(50, 150);
+            scene.physics.velocityFromAngle(angle, speed, item.body.velocity);
+
+            scene.droppedItemTab.push(item);
+
+            scene.time.delayedCall(300, () => {
+                item.isFollowing = true;
+                item.body.setVelocity(0);
             })
         });
     }
+}
+
+function updateLoot(scene) {
+    if (!scene.droppedItemTab) {
+        return;
+    }
+
+    scene.droppedItemTab.forEach((item, col) => {
+        if (item.isFollowing) {
+            let speed = 200;
+
+            scene.physics.moveTo(item, scene.character.x, scene.character.y, speed);
+
+            if (Phaser.Math.Distance.Between(item.x, item.y, scene.character.x, scene.character.y) < 8) {
+                scene.inventory.addItem(item.name, 1);
+                item.destroy();
+                scene.droppedItemTab.splice(col, 1);
+            }
+        }
+    })
+}
+
+export function enableLootItemTab(scene) {
+    scene.droppedItemTab = [];
+    scene.events.on('update', () => {
+        updateLoot(scene);
+    })
 }

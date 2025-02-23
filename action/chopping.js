@@ -1,7 +1,5 @@
 import { drop_item } from '../tool_file/drop_item.js';
-import { walking_queue } from "../tool_file/walking_queue.js";
-
-let choppingInProgress = false;
+import { walkingQueue } from "../tool_file/walking_queue.js";
 
 export function startChopping(scene) {
     let tree = null;
@@ -12,10 +10,9 @@ export function startChopping(scene) {
         }
     });
 
-    if (!choppingInProgress && tree) {
+    if (!scene.character.isChopping && tree) {
         scene.character.isChopping = true;
-        walking_queue(scene, 'chopping', 'cannot');
-        choppingInProgress = true;
+        walkingQueue(scene, 'chopping', 'cannot');
     }
 }
 
@@ -31,7 +28,7 @@ export function endChopping(scene) {
     scene.currentHitBox = scene.currentHitBox.filter(e => e !== tree);
 
     tree.setTexture('trunk');
-    walking_queue(scene, 'chopping', 'can');
+    walkingQueue(scene, 'chopping', 'can');
 
     drop_item(scene, tree.x, tree.y, scene.character.x, scene.character.y, 'tree');
 }

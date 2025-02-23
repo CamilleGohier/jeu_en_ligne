@@ -26,3 +26,30 @@ export const secondOptions = {
         {},
     ],
 };
+
+export let content = [
+    [
+        { name: 'wheat_seed', quantity: 4 },
+        { name: 'tomato_seed', quantity: 2 },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    [
+        null, 
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ]
+];
