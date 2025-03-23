@@ -2,22 +2,24 @@ import Inventory from './Inventory.js';
 import { inventoryQueue } from '../tool_file/walking_queue.js';
 
 export default class Storage {
-    constructor(scene, x, y, texture, rows, cols) {
+    constructor(scene, posCol, posRow, texture, rows, cols) {
+        this.x = posCol * 32;
+        this.y = posRow * 32;
         this.scene = scene;
         this.tileSize = 20;
         this.tileScale = 0.6;
-        this.startX = x - (cols * this.tileSize) / 2 + this.tileSize /2;
-        this.startY = y - this.tileSize * rows;
+        this.startX = this.x - (cols * this.tileSize) / 2 + this.tileSize /2;
+        this.startY = this.y - this.tileSize * rows;
         this.rows = rows;
         this.cols = cols;
-        this.area = this.scene.add.rectangle(this.startX + (this.cols * this.tileSize) /2 - this.tileSize/2, this.startY + (this.rows * this.tileSize) /2 - this.tileSize/2, this.cols * this.tileSize, this.rows * this.tileSize);
+        this.area = this.scene.add.rectangle(this.startX + this.tileSize/4, this.startY - (this.rows * this.tileSize) /2 + this.tileSize + (this.rows % 2 != 0 ? this.tileSize/2 : 0), this.cols * this.tileSize, this.rows * this.tileSize).setOrigin(0);
 
         this.content = Array.from({ length: this.rows }, () => Array(this.cols).fill(null));
         this.background = [];
 
-        this.playerInventory = new Inventory(scene, x - (this.scene.inventory.cols * this.tileSize)/2 + this.tileSize /2, y + (this.scene.inventory.rows * 20), this.tileSize, this.scene.inventory.rows, this.scene.inventory.cols, 1)
+        this.playerInventory = new Inventory(scene, this.x - (this.scene.inventory.cols * this.tileSize) / 2 + this.tileSize /2 + this.tileSize/4, this.y + (this.scene.inventory.rows * 20), this.tileSize, this.scene.inventory.rows, this.scene.inventory.cols, 1)
 
-        const sprite = scene.add.sprite(x, y, texture).setInteractive();
+        const sprite = scene.add.sprite(this.x, this.y, texture).setInteractive().setOrigin(0);
         this.sprite = sprite;
 
         this.createGrid(this.startX, this.startY);
@@ -32,10 +34,10 @@ export default class Storage {
     createGrid(startX, startY) {
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                const x = c * this.tileSize + startX;
+                const x = c * this.tileSize + startX + this.tileSize/4;
                 const y = r * this.tileSize + startY;
     
-                const cell = this.scene.add.sprite(x, y, 'tile').setScale(this.tileScale);
+                const cell = this.scene.add.sprite(x, y, 'tile').setScale(this.tileScale).setDepth(100).setOrigin(0);
 
                 this.background.push(cell);
             }
@@ -54,11 +56,11 @@ export default class Storage {
             
             if (emptyPosition) {
                 let { row, col } = emptyPosition;
-                const x = col * this.tileSize + this.startX;
+                const x = col * this.tileSize + this.startX + this.tileSize/4;
                 const y = row * this.tileSize + this.startY;
 
-                const item = this.scene.add.sprite(x, y, name).setInteractive().setScale(this.tileScale);
-                const itemText = this.scene.add.text(x, y, quantity.toString(), { font: '12px Arial', fill: '#000' });
+                const item = this.scene.add.sprite(x, y, name).setInteractive().setScale(this.tileScale).setDepth(105).setOrigin(0);
+                const itemText = this.scene.add.text(x + 8, y + 8, quantity.toString(), { font: '12px Arial', fill: '#000' }).setDepth(105);
 
                 item.quantity = itemText;
                 item.name = name;
@@ -82,11 +84,11 @@ export default class Storage {
     }
 
     addItemAtPosition(name, quantity, row, col) {
-        const x = col * this.tileSize + this.startX;
+        const x = col * this.tileSize + this.startX + this.tileSize/4;
         const y = row * this.tileSize + this.startY;
 
-        const item = this.scene.add.sprite(x, y, name).setInteractive().setScale(this.tileScale);
-        const itemText = this.scene.add.text(x, y, quantity.toString(), { font: '12px Arial', fill: '#000' });
+        const item = this.scene.add.sprite(x, y, name).setInteractive().setScale(this.tileScale).setDepth(105).setOrigin(0);
+        const itemText = this.scene.add.text(x + 8, y + 8, quantity.toString(), { font: '12px Arial', fill: '#000' }).setDepth(105);
 
         item.quantity = itemText;
         item.name = name;

@@ -1,5 +1,4 @@
 import { data } from '../data/loot.js';
-import Inventory from '../stockage/Inventory.js';
 
 export function drop_item(scene, startX, startY, endX, endY, loot) {
 

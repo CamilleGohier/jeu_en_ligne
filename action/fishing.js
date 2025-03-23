@@ -5,11 +5,11 @@ let fishingInProgress = false;
 let fishingTimeout;
 
 export function startFishing(scene) {
-    const x = Math.floor((scene.character.x - 400) / 32);
-    const y = Math.floor(scene.character.y / 32);
-    const cell = scene.waterGrid.find(c => c.x == x && c.y == y);
+    const row = Math.floor(scene.character.y / 32);
+    const col = Math.floor(scene.character.x / 32);
+    const cell = scene.worldGrid[row][col];
 
-    if (cell && !fishingInProgress) {
+    if (cell.ground.texture.key == 'water' && !fishingInProgress) {
         fishingInProgress = true;
         walkingQueue(scene, 'fishing', 'cannot');
         scene.character.isFishing = true;

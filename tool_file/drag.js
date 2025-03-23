@@ -13,14 +13,15 @@ function ondragStart(pointer, item) {
     item.quantity.setScale(item.quantity.scale - 0.2);
     item.setData('startX', item.x);
     item.setData('startY', item.y);
+    item.setData('quantityOffset', item.quantity.x - item.x);
 }
 
 function onDrag(pointer, item, dragX, dragY) {
     // Déplace l'item en main avec les mouvements de la souris
-    item.x = dragX;
-    item.y = dragY;
-    item.quantity.x = dragX;
-    item.quantity.y = dragY;
+    item.x = dragX + 5;
+    item.y = dragY + 5;
+    item.quantity.x = item.x + item.getData('quantityOffset');
+    item.quantity.y = item.y + item.getData('quantityOffset');
 }
 
 function onDragEnd(pointer, item) {
@@ -43,8 +44,8 @@ function onDragEnd(pointer, item) {
     const targetContainer = findDropContainer(scene, worldPoint);
 
     if (targetContainer) {
-        const targetCol = Math.floor((worldPoint.x - targetContainer.startX + targetContainer.tileSize/2) / targetContainer.tileSize);
-        const targetRow = Math.floor((worldPoint.y - targetContainer.startY + targetContainer.tileSize/2) / targetContainer.tileSize);
+        const targetCol = Math.floor((worldPoint.x - targetContainer.startX) / targetContainer.tileSize);
+        const targetRow = Math.floor((worldPoint.y - targetContainer.startY) / targetContainer.tileSize);
         
         // Fusion des objets de même nom
         if (targetContainer.content[targetRow][targetCol] && targetContainer.content[targetRow][targetCol].name == item.name && item != targetContainer.content[targetRow][targetCol]) {
@@ -85,8 +86,8 @@ function findDropContainer(scene, worldPoint) {
 }
 
 function mergeItem(fromContainer, toContainer, item, worldPointX, worldPointY) {
-    const targetCol = Math.floor((worldPointX - toContainer.startX + toContainer.tileSize/2) / toContainer.tileSize);
-    const targetRow = Math.floor((worldPointY - toContainer.startY + toContainer.tileSize/2) / toContainer.tileSize);
+    const targetCol = Math.floor((worldPointX - toContainer.startX) / toContainer.tileSize);
+    const targetRow = Math.floor((worldPointY - toContainer.startY) / toContainer.tileSize);
 
     toContainer.content[targetRow][targetCol].quantity.setText(parseInt(toContainer.content[targetRow][targetCol].quantity.text) + parseInt(item.quantity.text));
     fromContainer.content[item.getData('row')][item.getData('col')] = null;
@@ -99,8 +100,8 @@ function mergeItem(fromContainer, toContainer, item, worldPointX, worldPointY) {
 function transferItem(fromContainer, toContainer, item, worldPointX, worldPointY) {
     const col = item.getData('col');
     const row = item.getData('row');
-    const targetCol = Math.floor((worldPointX - toContainer.startX + toContainer.tileSize/2) / toContainer.tileSize);
-    const targetRow = Math.floor((worldPointY - toContainer.startY + toContainer.tileSize/2) / toContainer.tileSize);
+    const targetCol = Math.floor((worldPointX - toContainer.startX) / toContainer.tileSize);
+    const targetRow = Math.floor((worldPointY - toContainer.startY) / toContainer.tileSize);
     const quantity = parseInt(item.quantity.text);
 
     if (isPositionValid(toContainer, targetRow, targetCol)) {
@@ -117,8 +118,8 @@ function transferItem(fromContainer, toContainer, item, worldPointX, worldPointY
 }
 
 function moveItemWithinContainer(item, container) {
-    const targetCol = Math.floor((item.x - container.startX + container.tileSize/2) / container.tileSize);
-    const targetRow = Math.floor((item.y - container.startY + container.tileSize/2) / container.tileSize);
+    const targetCol = Math.floor((item.x - container.startX) / container.tileSize);
+    const targetRow = Math.floor((item.y - container.startY) / container.tileSize);
 
     if (isPositionValid(container, targetRow, targetCol)) {
         container.content[item.getData('row')][item.getData('col')] = null;
@@ -126,13 +127,15 @@ function moveItemWithinContainer(item, container) {
         item.setData('row', targetRow);
         container.content[targetRow][targetCol] = item;
 
-        item.x = targetCol * container.tileSize + container.startX;
+        item.x = targetCol * container.tileSize + container.startX + (container instanceof Inventory ? 0 : + container.tileSize/4);
         item.y = targetRow * container.tileSize + container.startY;
-        item.quantity.x = item.x;
-        item.quantity.y = item.y;
+        item.quantity.x = item.x + 8 + (container.tileSize == 32 ? 8 : 0);
+        item.quantity.y = item.y + 8 + (container.tileSize == 32 ? 8 : 0);
+
+        container.save();
     }
     else {
-        resetItemPosition(item);
+        resetItemPosition(item, container);
     }
 }
 
@@ -140,9 +143,9 @@ function isPositionValid(container, row, col) {
     return (row >= 0 && row < container.rows && col >= 0 && col < container.cols && !container.content[row][col]);
 }
 
-function resetItemPosition(item) {
+function resetItemPosition(item, container) {
     item.x = item.getData('startX');
     item.y = item.getData('startY');
-    item.quantity.x = item.getData('startX');
-    item.quantity.y = item.getData('startY');
+    item.quantity.x = item.getData('startX') + item.getData('quantityOffset');
+    item.quantity.y = item.getData('startY') + item.getData('quantityOffset');
 }

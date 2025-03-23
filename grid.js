@@ -1,29 +1,62 @@
-export function createGroundGrid(scene) {
-    for (let x = 0; x < (scene.physics.world.bounds.width /32); x++) {
-        for (let y = 0; y < (scene.physics.world.bounds.height /32); y++) {
-            const randomFrame = Phaser.Math.Between(0, 11);
-            scene.add.sprite(x * 32, y * 32, 'grass', randomFrame).setOrigin(0);
+export function createWorldGrid(scene) {
+
+    const rows = Math.floor(scene.physics.world.bounds.height / 32);
+    const cols = Math.floor(scene.physics.world.bounds.width / 32);
+
+    scene.worldGrid = new Array(rows);
+    for (let row = 0; row < rows; row++) {
+        scene.worldGrid[row] = new Array(cols);
+        for (let col = 0; col < cols; col++) {
+            scene.worldGrid[row][col] = { ground: null, floor: null, object: null };
         }
     }
+
+    createSoilGrid(scene);
+    createWaterGrid(scene);
+    createGroundGrid(scene);
 }
 
-export function createSoilGrid(scene) {
-    scene.soilGrid = [];
-    for (let x = 0; x < 10; x++) {
-        for (let y = 0; y < 10; y++) {
+function createSoilGrid(scene) {
+    for (let row = 2; row <= 6; row++) {
+        for (let col = 2; col <= 12; col++) {
             const randomFrame = Phaser.Math.Between(0, 3);
-            scene.add.sprite(x * 32, y * 32, 'soil', randomFrame).setOrigin(0);
-            scene.soilGrid.push({x, y, planted: false, crop: null, growthStage: 0});
+            let tile = scene.add.sprite(col * 32, row * 32, 'soil', randomFrame).setOrigin(0).setDepth(0);
+            tile.name = 'soil';
+            scene.worldGrid[row][col].ground = tile;
         }
     }
 }
 
-export function createWaterGrid(scene) {
-    scene.waterGrid = [];
-    for (let x = 0; x < 4; x++) {
-        for (let y = 0; y < 8; y++) {
-            scene.add.sprite(x * 32 + 400, y * 32 + 0, 'water').setOrigin(0);
-            scene.waterGrid.push({x, y});
+function createWaterGrid(scene) {
+    for (let row = 10; row <= 16; row++) {
+        for (let col = 45; col <= 49; col++) {
+            let tile = scene.add.sprite(col * 32, row * 32, 'water').setOrigin(0).setDepth(0);
+            tile.name = 'water';
+            scene.worldGrid[row][col].ground = tile;
+        }
+    }
+
+    for (let row = 22; row <= 26; row++) {
+        for (let col = 12; col <= 25; col++) {
+            let tile = scene.add.sprite(col * 32, row * 32, 'water').setOrigin(0).setDepth(0);
+            tile.name = 'water';
+            scene.worldGrid[row][col].ground = tile;
+        }
+    }
+}
+
+function createGroundGrid(scene) {
+    const rows = Math.floor(scene.physics.world.bounds.height / 32);
+    const cols = Math.floor(scene.physics.world.bounds.width / 32);
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            if (scene.worldGrid[row][col] && scene.worldGrid[row][col].ground == null ) {
+                const randomFrame = Phaser.Math.Between(0, 11);
+                let tile = scene.add.sprite(col * 32, row * 32, 'grass', randomFrame).setOrigin(0).setDepth(0);
+                tile.name = 'grass';
+                scene.worldGrid[row][col].ground = tile;
+            }
         }
     }
 }

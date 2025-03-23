@@ -5,6 +5,7 @@ import { createHpBar } from "./tool_file/hp_bar.js";
 
 export function characterAnimations(scene) {
     scene.character = scene.physics.add.sprite(scene.scale.width / 2, scene.scale.height / 2, 'character').setCollideWorldBounds(true);
+    scene.character.setSize(24, 16).setOffset(4, 16).setDepth(10);
 
     let hpBar = createHpBar(scene, scene.character, 100, 20, -20);
     scene.character.hpBar = hpBar;

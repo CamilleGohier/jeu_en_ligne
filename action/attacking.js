@@ -1,4 +1,3 @@
-import { enemyTakeDamage } from '../enemies/enemy.js';
 import { updateHpBar } from '../tool_file/hp_bar.js';
 
 const invicibilityDuration = 2000;
@@ -13,7 +12,7 @@ export function detectEnemies(scene) {
     
     scene.physics.add.overlap(scene.sword, scene.enemiesGroup, (sword, enemy) => {
         if (!scene.sword.hitEnemies.find(e => e == enemy)) {
-            enemyTakeDamage(scene, enemy, -5);
+            enemy.entity.enemyTakeDamage(-5);
             scene.sword.hitEnemies.push(enemy);
         }
     });

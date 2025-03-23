@@ -30,5 +30,6 @@ export function endMining(scene) {
     walkingQueue(scene, 'mining', 'can');
 
     drop_item(scene, rock.x, rock.y, scene.character.x, scene.character.y, 'rock');
+    scene.worldGrid[rock.y /32][rock.x /32].object = null;
     rock.destroy();
 }

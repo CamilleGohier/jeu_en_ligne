@@ -16,7 +16,7 @@ export default class Inventory {
         this.tileSize = tileSize;
         this.tileScale = tileSize / 32;
         this.content = Array.from({ length: this.rows }, () => Array(this.cols).fill(null));
-        this.area = this.scene.add.rectangle(this.startX + (this.cols * this.tileSize) /2 - this.tileSize/2, this.startY + (this.rows * this.tileSize) /2 - this.tileSize/2, this.cols * this.tileSize, this.rows * this.tileSize).setScrollFactor(this.dynamic);
+        this.area = this.scene.add.rectangle(this.startX, this.startY, this.cols * this.tileSize, this.rows * this.tileSize).setScrollFactor(this.dynamic).setOrigin(0);
 
         this.isVisible = true;
 
@@ -35,15 +35,19 @@ export default class Inventory {
                 const x = c * this.tileSize + this.startX;
                 const y = r * this.tileSize + this.startY;
 
-                const cell = this.scene.add.sprite(x, y, 'tile').setScrollFactor(this.dynamic).setScale(this.tileScale).setDepth(5);
+                const cell = this.scene.add.sprite(x, y, 'tile').setScrollFactor(this.dynamic).setScale(this.tileScale).setDepth(100).setOrigin(0);
                 this.background.push(cell);
             }
         }
     }
 
     createItem(name, quantity, x, y) {
-        const item = this.scene.add.sprite(x, y, name).setInteractive().setScale(this.tileScale).setScrollFactor(this.dynamic).setVisible(this.isVisible).setDepth(5);
-        const itemText = this.scene.add.text(x, y, quantity.toString(), { font: '12px Arial', fill: '#000' }).setScrollFactor(this.dynamic).setVisible(this.isVisible).setDepth(5);
+        const item = this.scene.add.sprite(x, y, name).setInteractive().setScale(this.tileScale).setScrollFactor(this.dynamic).setVisible(this.isVisible).setDepth(105).setOrigin(0);
+        const itemText = this.scene.add.text(x + 8, y + 8, quantity.toString(), { font: '12px Arial', fill: '#000' }).setScrollFactor(this.dynamic).setVisible(this.isVisible).setDepth(105);
+        
+        if (this.dynamic == 0) {
+            itemText.setPosition(x + 16, y + 16);
+        }
         
         item.quantity = itemText;
         item.name = name;

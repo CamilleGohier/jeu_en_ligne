@@ -27,8 +27,17 @@ export function endChopping(scene) {
 
     scene.currentHitBox = scene.currentHitBox.filter(e => e !== tree);
 
-    tree.setTexture('trunk');
-    walkingQueue(scene, 'chopping', 'can');
-
-    drop_item(scene, tree.x, tree.y, scene.character.x, scene.character.y, 'tree');
+    if (tree.isCut) {
+        walkingQueue(scene, 'chopping', 'can');
+        drop_item(scene, tree.x, tree.y, scene.character.x, scene.character.y, 'trunk');
+        scene.worldGrid[tree.y /32][tree.x /32].object = null;
+        tree.destroy();
+    }
+    else {
+        tree.setTexture('trunk');
+        tree.isCut = true;
+        walkingQueue(scene, 'chopping', 'can');
+        drop_item(scene, tree.x, tree.y, scene.character.x, scene.character.y, 'tree');
+        
+    }
 }

@@ -29,6 +29,12 @@ export const data = {
             "quantity_max": 2
         }
     ],
+    "trunk" : [
+        {
+            "item": "wood",
+            "quantity_max": 1
+        },
+    ],
     "rock" : [
         {
             "item": "stone",
