@@ -1,8 +1,12 @@
 import Inventory from './Inventory.js';
-import { inventoryQueue } from '../tool_file/walking_queue.js';
+import { inventoryQueue } from '../toolFile/walkingQueue.js';
+import Item from '../toolFile/Item.js';
+import { dropObject } from '../toolFile/drop.js';
+import { dictionary } from '../data/dictionary.js';
 
-export default class Storage {
-    constructor(scene, posCol, posRow, texture, rows, cols) {
+export default class Storage extends Item {
+    constructor(scene, posRow, posCol, texture, rows, cols, positionNPC) {
+        super (posRow, posCol, 'shelf', positionNPC);
         this.x = posCol * 32;
         this.y = posRow * 32;
         this.scene = scene;
@@ -19,15 +23,16 @@ export default class Storage {
 
         this.playerInventory = new Inventory(scene, this.x - (this.scene.inventory.cols * this.tileSize) / 2 + this.tileSize /2 + this.tileSize/4, this.y + (this.scene.inventory.rows * 20), this.tileSize, this.scene.inventory.rows, this.scene.inventory.cols, 1)
 
-        const sprite = scene.add.sprite(this.x, this.y, texture).setInteractive().setOrigin(0);
-        this.sprite = sprite;
+        this.sprite.setInteractive(new Phaser.Geom.Rectangle(0, 32, 32, 32), Phaser.Geom.Rectangle.Contains);
 
         this.createGrid(this.startX, this.startY);
         this.load();
         this.hide();
 
-        this.sprite.on('pointerdown', () => {
-            this.toggleVisibility(this);
+        this.sprite.on('pointerdown', (pointer) => {
+            if (pointer.leftButtonDown()) {
+                this.toggleVisibility(this);
+            }
         })
     }
 
@@ -62,6 +67,10 @@ export default class Storage {
                 const item = this.scene.add.sprite(x, y, name).setInteractive().setScale(this.tileScale).setDepth(105).setOrigin(0);
                 const itemText = this.scene.add.text(x + 8, y + 8, quantity.toString(), { font: '12px Arial', fill: '#000' }).setDepth(105);
 
+                if (dictionary[name] && dictionary[name].origin) {
+                    item.setOrigin(dictionary[name].origin[0], dictionary[name].origin[1]);
+                }
+
                 item.quantity = itemText;
                 item.name = name;
                 item.setData('row', row);
@@ -90,6 +99,10 @@ export default class Storage {
         const item = this.scene.add.sprite(x, y, name).setInteractive().setScale(this.tileScale).setDepth(105).setOrigin(0);
         const itemText = this.scene.add.text(x + 8, y + 8, quantity.toString(), { font: '12px Arial', fill: '#000' }).setDepth(105);
 
+        if (dictionary[name] && dictionary[name].origin) {
+            item.setOrigin(dictionary[name].origin[0], dictionary[name].origin[1]);
+        }
+
         item.quantity = itemText;
         item.name = name;
         this.content[row][col] = item;
@@ -107,8 +120,17 @@ export default class Storage {
         this.save();
     }
 
-    removeItem(name, quantity) {
-        // Peut-être un jour j'en aurai besoin
+    removeItems() {
+        this.hide();
+        this.playerInventory.hide();
+
+        this.content.flat().forEach(item => {
+            if (item) {
+                for (let quantity = 0; quantity < Number(item.quantity.text); quantity++) {
+                    dropObject(this.scene, this.x, this.y, item.name);
+                }
+            }
+        });
     }
 
     findItemPosition(name) {
@@ -150,9 +172,9 @@ export default class Storage {
         })
         this.background.forEach(cell => cell.setVisible(true));
 
-        const timer = this.scene.time.addEvent({
+        this.timer = this.scene.time.addEvent({
             delay: 500,
-            callback: () => this.checkDistancePlayer(timer),
+            callback: () => this.checkDistancePlayer(),
             callbackScope: this,
             loop: true
         })
@@ -176,6 +198,7 @@ export default class Storage {
             })
         })
         this.background.forEach(icon => icon.setVisible(false));
+        this.playerInventory.hide();
         this.isVisible = false;
 
         inventoryQueue(this.scene, 'tradeOpen', 'can');
@@ -185,6 +208,7 @@ export default class Storage {
         if (this.isVisible) {
             this.hide();
             this.playerInventory.hide();
+            this.scene.currentOpenedInterface = null;
         }
         else {
             const distance = Phaser.Math.Distance.Between(this.scene.character.x, this.scene.character.y, this.sprite.x, this.sprite.y);
@@ -192,6 +216,12 @@ export default class Storage {
             if (distance < 50) {
                 this.show();
                 this.playerInventory.show();
+                if (this.scene.currentOpenedInterface instanceof Storage) {
+                    this.scene.currentOpenedInterface.clicked = false;
+                    this.scene.currentOpenedInterface.sprite.setTexture('shelf'+(this.scene.currentOpenedInterface.color == 1 ? '' : this.scene.currentOpenedInterface.color));
+                    this.scene.currentOpenedInterface.toggleVisibility();
+                }
+                this.scene.currentOpenedInterface = this;
             }
         }
     }
@@ -230,13 +260,19 @@ export default class Storage {
         this.content = Array.from({ length: this.rows}, () => Array(this.cols).fill(null));
     }
 
-    checkDistancePlayer(timer) {
+    checkDistancePlayer() {
         const distance = Phaser.Math.Distance.Between(this.scene.character.x, this.scene.character.y, this.sprite.x, this.sprite.y);
 
         if (distance > 50) {
             this.hide();
             this.playerInventory.hide();
-            timer.remove();
+            this.timer.remove();
+            if (this.scene.currentOpenedInterface == this) {
+                this.scene.currentOpenedInterface = null;
+            }
+            this.sprite.setTexture('shelf'+(this.color == 1 ? '' : this.color));
+            this.sprite.setFrame(this.currentFrame);
+            this.clicked = false;
         }
     }
 }

@@ -2,61 +2,67 @@ export const tools = [
    {
     key: 'hand', name: 'Main vide',
     secondary: [
-        { key: 'wall' },
-        { key: 'door' },
-        { key: 'parquet' },
-        { key: 'desk' },
-        { key: null }
+        { key: 'shelf' },
+        { key: 'workbench' },
+        { key: 'empty' },
+        { key: 'empty' },
+        { key: 'empty' }
     ]
    },
 
    {
     key: 'sword', name: 'Épée',
-    secondary: []
+    secondary: null
    },
 
    {
     key: 'pickaxe', name: 'Pioche',
-    secondary: []
+    secondary: null
    },
 
    {
     key: 'axe', name: 'Hache',
-    secondary: []
+    secondary: null
    },
    
    {
     key: 'fishing_rod', name: 'Canne à pêche',
-    secondary: []
+    secondary: [
+        { key: 'empty' },
+        { key: 'empty' },
+        { key: 'empty' },
+        { key: 'empty' },
+        { key: 'empty' }
+    ]
    },
 
    {
     key: 'hoe', name: 'Houe',
     secondary: [
-        { key: 'wheat_seed', crop: 'wheat_crop' },
-        { key: 'tomato_seed', crop: 'tomato_crop' },
-        { key: null },
-        { key: null },
-        { key: null }
+        { key: 'empty' },
+        { key: 'empty' },
+        { key: 'empty' },
+        { key: 'empty' },
+        { key: 'empty' }
     ]
    },
 
    {
-    key: 'watering_can', name: 'Arrosoir',
-    secondary: []
+    key: 'wrench', name: 'Clé à molette',
+    secondary: null
    },
 
    {
     key: 'shovel', name: 'Pelle',
-    secondary: []
+    secondary: null
    },
 ];
 
 export let content = [
     [
-        { name: 'wheat_seed', quantity: 4 },
-        { name: 'tomato_seed', quantity: 2 },
-        { name: 'desk', quantity: 1 },
+        { 'name': 'shelf', 'quantity': 1 },
+        { 'name': 'workbench', 'quantity': 1 },
+        null,
         null,
         null,
         null,
@@ -66,7 +72,7 @@ export let content = [
         null
     ],
     [
-        null, 
+        null,
         null,
         null,
         null,

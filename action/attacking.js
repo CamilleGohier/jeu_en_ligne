@@ -1,4 +1,4 @@
-import { updateHpBar } from '../tool_file/hp_bar.js';
+import { updateHpBar } from '../toolFile/hpBar.js';
 
 const invicibilityDuration = 2000;
 

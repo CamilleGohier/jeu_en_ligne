@@ -1,3 +1,4 @@
+import { dictionary } from '../data/dictionary.js';
 import { content } from '../data/variables.js';
 
 export default class Inventory {
@@ -47,6 +48,10 @@ export default class Inventory {
         
         if (this.dynamic == 0) {
             itemText.setPosition(x + 16, y + 16);
+        }
+
+        if (dictionary[name] && dictionary[name].origin) {
+            item.setOrigin(dictionary[name].origin[0], dictionary[name].origin[1]);
         }
         
         item.quantity = itemText;

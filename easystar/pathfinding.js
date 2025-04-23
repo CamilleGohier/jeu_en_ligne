@@ -1,3 +1,5 @@
+import { dictionary } from "../data/dictionary.js";
+
 const easystar = new EasyStar.js();
 
 export function createRandomPathfinding(scene, character, target, callback = null) {
@@ -6,7 +8,10 @@ export function createRandomPathfinding(scene, character, target, callback = nul
             if (cell.ground.texture.key == 'grass' && cell.object == null) {
                 return 0;
             }
-            else if (cell.ground.texture.key == 'grass' && cell.object == "positionNPC") {
+            else if (cell.ground.texture.key == 'grass' && cell.object.circle) {
+                return 0;
+            }
+            else if (cell.object && cell.object.name && dictionary[cell.object.name] && dictionary[cell.object.name].type.includes("crossable") && cell.object.crossable == true) {
                 return 0;
             }
             return 1;
@@ -60,7 +65,10 @@ export function createDirectPathfinding(scene, character, target, callback = nul
             if (cell.ground.texture.key == 'grass' && cell.object == null) {
                 return 0;
             }
-            else if (cell.ground.texture.key == 'grass' && cell.object == "positionNPC") {
+            else if (cell.ground.texture.key == 'grass' && cell.object.circle) {
+                return 0;
+            }
+            else if (cell.object && cell.object.name && dictionary[cell.object.name] && dictionary[cell.object.name].type.includes("crossable") && cell.object.crossable == true) {
                 return 0;
             }
             return 1;
@@ -71,9 +79,8 @@ export function createDirectPathfinding(scene, character, target, callback = nul
     easystar.setAcceptableTiles([0]);
 
     easystar.findPath(character.col, character.row, target.col, target.row, (path) => {
-
         if (path == null) {
-            character.move();
+            // Pas de chemin
         }
         else {
             if (path.length > 0 && path[0].x == character.col && path[0].y == character.row) {

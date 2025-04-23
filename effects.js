@@ -23,14 +23,6 @@ export function createEffectScene(scene) {
         })
     });
 
-    scene.npcs.forEach(npc => {
-        npc.sprite.setPipeline('Light2D');
-    });
-
-    scene.storages.forEach(storage => {
-        storage.sprite.setPipeline('Light2D');
-    });
-
     const graphic = scene.add.graphics();
     graphic.fillStyle(0xffffff, 0.5).fillRect(0, 0, 2, 2).generateTexture('spark', 2, 2).destroy();
 

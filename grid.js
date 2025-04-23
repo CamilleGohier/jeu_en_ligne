@@ -17,8 +17,8 @@ export function createWorldGrid(scene) {
 }
 
 function createSoilGrid(scene) {
-    for (let row = 2; row <= 6; row++) {
-        for (let col = 2; col <= 12; col++) {
+    for (let row = 6; row <= 8; row++) {
+        for (let col = 8; col <= 11; col++) {
             const randomFrame = Phaser.Math.Between(0, 3);
             let tile = scene.add.sprite(col * 32, row * 32, 'soil', randomFrame).setOrigin(0).setDepth(0);
             tile.name = 'soil';

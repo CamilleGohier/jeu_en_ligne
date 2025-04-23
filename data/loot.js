@@ -45,18 +45,35 @@ export const data = {
             "quantity_max": 1
         }
     ],
-    "fishing" : [
-        {
-            "item": "fish"
-        },
-        {
-            "item" : "waste"
-        }
-    ],
     "enemy" : [
         {
             "item": "slime_bubble",
             "quantity_max": 2
         },
+    ],
+    "cow" : [
+        {
+            "item": "milk",
+            "quantity_max": 1
+        }
+    ],
+    "nest" : [
+        {
+            "item": "egg",
+            "quantity_max": 1
+        }
+    ]
+}
+
+export const fishingData = {
+    "good" : [ 
+        "fish1", 
+        "fish2" 
+    ],
+    "bad" : [ 
+        "boot", 
+        "waste", 
+        "seaweed" ,
+        "clay"
     ]
 }

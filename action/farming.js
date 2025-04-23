@@ -1,11 +1,17 @@
-import { drop_item } from '../tool_file/drop_item.js';
+import { dropLoot } from '../toolFile/drop.js';
 import Inventory from '../stockage/Inventory.js';
 import { tools } from '../data/variables.js';
 import { addEffectSceneToItem } from '../effects.js';
 
-export function startFarming(scene) {
-    const col = Math.floor(scene.character.x / 32);
-    const row = Math.floor(scene.character.y / 32);
+export function startFarming(scene, pointer) {
+    const worldPosition = scene.cameras.main.getWorldPoint(scene.input.activePointer.x, scene.input.activePointer.y);
+
+    if (Phaser.Math.Distance.Between(scene.character.x + 16, scene.character.y + 16, worldPosition.x, worldPosition.y) > 50) {
+        return;
+    }
+
+    const col = Math.floor(worldPosition.x / 32);
+    const row = Math.floor(worldPosition.y / 32);
     const cell = scene.worldGrid[row][col].ground;
 
     let seed = null;
@@ -31,7 +37,7 @@ export function startFarming(scene) {
 export function plantSeed(scene, cell, seed) {
     scene.character.isFarming = true;
     cell.planted = true;
-    cell.crop = scene.add.image(cell.x, cell.y, seed.name + '_crop', 0).setOrigin(0);
+    cell.crop = scene.add.sprite(cell.x, cell.y, seed.name + '_crop', 0).setOrigin(0).setDepth(10);
     scene.worldGrid[cell.x /32][cell.y /32].object = cell.crop;
     addEffectSceneToItem(scene, cell.crop);
     cell.crop.name = seed.name + '_crop';
@@ -63,7 +69,7 @@ export function harvestCrop(scene, cell) {
     scene.character.isFarming = true;
     let crop = cell.crop;
     
-    drop_item(scene, cell.x, cell.y, scene.character.x, scene.character.y, crop.name);
+    dropLoot(scene, cell.x, cell.y, crop.name);
 
     cell.planted = false;
     cell.crop.destroy();

@@ -1,14 +1,21 @@
-import { drop_item } from '../tool_file/drop_item.js';
-import { walkingQueue } from "../tool_file/walking_queue.js";
+import { dropLoot } from '../toolFile/drop.js';
+import { walkingQueue } from "../toolFile/walkingQueue.js";
 
-export function startChopping(scene) {
+let worldPosition = null;
+
+export function startChopping(scene, pointer) {
     let tree = null;
+    worldPosition = scene.cameras.main.getWorldPoint(scene.input.activePointer.x, scene.input.activePointer.y);
 
-    scene.currentHitBox.forEach(item => {
-        if (item.name == 'tree') {
-            tree = item;
-        }
-    });
+    if (Phaser.Math.Distance.Between(scene.character.x + 16, scene.character.y + 16, worldPosition.x, worldPosition.y) > 50) {
+        return;
+    }
+    const col = Math.floor(worldPosition.x / 32);
+    const row = Math.floor(worldPosition.y / 32);
+
+    if (scene.worldGrid[row][col].object && scene.worldGrid[row][col].object.name == 'tree') {
+        tree = scene.worldGrid[row][col].object;
+    }
 
     if (!scene.character.isChopping && tree) {
         scene.character.isChopping = true;
@@ -17,19 +24,14 @@ export function startChopping(scene) {
 }
 
 export function endChopping(scene) {
-    let tree = null;
-    
-    scene.currentHitBox.forEach(item => {
-        if (item.name == 'tree') {
-            tree = item;
-        }
-    });
+    const col = Math.floor(worldPosition.x / 32);
+    const row = Math.floor(worldPosition.y / 32);
 
-    scene.currentHitBox = scene.currentHitBox.filter(e => e !== tree);
+    let tree = scene.worldGrid[row][col].object;
 
     if (tree.isCut) {
         walkingQueue(scene, 'chopping', 'can');
-        drop_item(scene, tree.x, tree.y, scene.character.x, scene.character.y, 'trunk');
+        dropLoot(scene, tree.x, tree.y, 'trunk');
         scene.worldGrid[tree.y /32][tree.x /32].object = null;
         tree.destroy();
     }
@@ -37,7 +39,7 @@ export function endChopping(scene) {
         tree.setTexture('trunk');
         tree.isCut = true;
         walkingQueue(scene, 'chopping', 'can');
-        drop_item(scene, tree.x, tree.y, scene.character.x, scene.character.y, 'tree');
+        dropLoot(scene, tree.x, tree.y, 'tree');
         
     }
 }

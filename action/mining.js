@@ -1,14 +1,21 @@
-import { drop_item } from '../tool_file/drop_item.js';
-import { walkingQueue } from "../tool_file/walking_queue.js";
+import { dropLoot } from '../toolFile/drop.js';
+import { walkingQueue } from "../toolFile/walkingQueue.js";
 
-export function startMining(scene) {
+let worldPosition = null;
+
+export function startMining(scene, pointer) {
     let rock = null;
+    worldPosition = scene.cameras.main.getWorldPoint(scene.input.activePointer.x, scene.input.activePointer.y);
 
-    scene.currentHitBox.forEach(item => {
-        if (item.name == 'rock') {
-            rock = item;
-        }
-    });
+    if (Phaser.Math.Distance.Between(scene.character.x + 16, scene.character.y + 16, worldPosition.x, worldPosition.y) > 50) {
+        return;
+    }
+    const col = Math.floor(worldPosition.x / 32);
+    const row = Math.floor(worldPosition.y / 32);
+
+    if (scene.worldGrid[row][col].object && scene.worldGrid[row][col].object.name == 'rock') {
+        rock = scene.worldGrid[row][col].object;
+    }
 
     if (!scene.character.isMining && rock) {
         scene.character.isMining = true;
@@ -17,19 +24,14 @@ export function startMining(scene) {
 }
 
 export function endMining(scene) {
-    let rock = null;
-    
-    scene.currentHitBox.forEach(item => {
-        if (item.name == 'rock') {
-            rock = item;
-        }
-    });
+    const col = Math.floor(worldPosition.x / 32);
+    const row = Math.floor(worldPosition.y / 32);
 
-    scene.currentHitBox = scene.currentHitBox.filter(e => e !== rock);
+    let rock = scene.worldGrid[row][col].object;
 
     walkingQueue(scene, 'mining', 'can');
 
-    drop_item(scene, rock.x, rock.y, scene.character.x, scene.character.y, 'rock');
+    dropLoot(scene, rock.x, rock.y, 'rock');
     scene.worldGrid[rock.y /32][rock.x /32].object = null;
     rock.destroy();
 }

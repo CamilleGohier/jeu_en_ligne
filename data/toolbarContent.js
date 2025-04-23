@@ -1,0 +1,20 @@
+export const toolbarContent = [
+    [
+        "door",
+        "feeder",
+        "fence",
+        "flower_pot",
+        "nest",
+        "parquet",
+        "shelf",
+        "wall",
+        "workbench"
+    ],
+    [
+        "worm"
+    ],
+    [
+        "tomato_seed",
+        "wheat_seed"
+    ]
+]
